@@ -1,12 +1,14 @@
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Meditation } from '@/types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Link } from 'expo-router';
 
 export function MeditationListItem({ meditation }: { meditation: Meditation }) {
 
     return (
-        <View className='flex-row items-center gap-3'>
+        <Link href={`/meditation/${meditation.id}`} asChild>
+        <Pressable className='flex-row items-center gap-3'>
             <View className='bg-green-700 p-2 rounded-full'>
                 <FontAwesome name="check" size={16} color="white" />
               
@@ -20,6 +22,7 @@ export function MeditationListItem({ meditation }: { meditation: Meditation }) {
 
                 </View>
             </View>
-        </View>
+        </Pressable>
+        </Link>
     );
 }
