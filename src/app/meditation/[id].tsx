@@ -5,6 +5,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from "react-native-safe-area-context";
+import Slider from "@react-native-community/slider";
 
 import { meditations } from '@/data';
 export default function MeditationDetails() {
@@ -18,7 +19,7 @@ export default function MeditationDetails() {
         <SafeAreaView className="bg-red-400  00 flex-1 p-2">
             {/* Top part */}
             <View className=" flex-1">
-                 {/* Header */}
+                {/* Header */}
                 <View className="flex-row items-center justify-between p-10">
                     <AntDesign name="infocirlceo" size={20} color="black" />
                     <View className="bg-gray-500 rounded-md p-2 ">
@@ -38,21 +39,29 @@ export default function MeditationDetails() {
             {/* Top part */}
             <View className=" flex-1">
 
-                 {/* Player Footer */}
+                {/* Player Footer */}
                 <View className="p-5 mt-auto gap-5" >
                     <View className="flex-row justify-between">
 
                         <MaterialIcons name="airplay" size={24} color="#5F5B53" />
                         <Ionicons name="cog-outline" size={24} color="#5F5B53" />
                     </View>
-                
-                <View>
-                    <View className="bg-zinc-400 h-2"/>
-                </View>
-                <View className="flex-row justify-between">
-                    <Text>03.14</Text>
-                    <Text>01.14</Text>
-                </View>
+
+                    <View>
+                        <Slider
+                            style={{ width: '100%', height: 40 }}
+                            value={0.5}
+                            minimumValue={0}
+                            maximumValue={1}
+                            minimumTrackTintColor="lightgray"
+                            maximumTrackTintColor="#000000"
+                            thumbTintColor="lightgray"
+                        />
+                    </View>
+                    <View className="flex-row justify-between">
+                        <Text>03.14</Text>
+                        <Text>01.14</Text>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
