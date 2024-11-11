@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 export default function MeditationDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [sound,setSound] = useState<Audio.Sound |undefined>();
+    const [isPlaying, setIsPlaying] =useState(false);
+    const [position, setPosition] =useState(0);
+    const [duration, setDuration] = useState(0);
 
 
      useEffect(() => {
@@ -22,6 +25,23 @@ export default function MeditationDetails() {
             require('@assets/meditations/mediAudio.mp3')
           );
           setSound(sound);
+          //getDuration Time
+          const status = await sound.getStatusAsync();
+          if(status.isLoaded){
+            setDuration(status.durationMillis || 0);
+          }
+          // setup an interval to update the playback position while playing
+          const interval = setInterval(async ()=>{
+            if(sound && isPlaying){
+                const status = await sound.getStatusAsync();
+                if (status.isLoaded){
+                    setPosition(status.positionMillis || 0 );
+                }
+            }
+          },500); // update happening every second
+          return ()=>{
+            clearInterval(interval);
+          };
         };
     
         loadSound();
@@ -34,10 +54,21 @@ export default function MeditationDetails() {
 
     async function playSound (){
         if(sound){
-            await sound.playAsync();
+            if(isPlaying){
+                await sound.pauseAsync();
+                setIsPlaying(false);
+            }else{
+                await sound.playAsync();
+                setIsPlaying(true);
+            }
+          
         }
     }
-    
+    const formatSeconds = (milliseconds :number)=>{
+        const minutes = Math.floor(milliseconds / 60000);
+        const seconds = Math.floor((milliseconds % 60000) / 1000);
+        return `${minutes}:${seconds.toString().padStart(2,'0')}`;
+    }
 
     const meditation = meditations.find((m) => m.id == Number(id));
     if (!meditation) {
@@ -60,7 +91,7 @@ export default function MeditationDetails() {
             </View>
             {/* Middle */}
             <Pressable onPress={playSound} className="bg-zinc-600 self-center p-6 w-20 aspect-square rounded-full items-center justify-center">
-                <FontAwesome6 name="play" size={24} color="white" />
+                <FontAwesome6 name={isPlaying? "pause" : "play"} size={24} color="white" />
 
             </Pressable>
 
@@ -78,17 +109,23 @@ export default function MeditationDetails() {
                     <View>
                         <Slider
                             style={{ width: '100%', height: 40 }}
-                            value={0.5}
+                            value={position}
                             minimumValue={0}
-                            maximumValue={1}
+                            maximumValue={duration}
                             minimumTrackTintColor="lightgray"
                             maximumTrackTintColor="#000000"
                             thumbTintColor="lightgray"
+                            onSlidingComplete={async(value)=>{
+                                if(sound) {
+                                   await sound.setPositionAsync(value)
+                                   setPosition(value)
+                                }
+                            }}
                         />
                     </View>
                     <View className="flex-row justify-between">
-                        <Text>03.14</Text>
-                        <Text>01.14</Text>
+                        <Text>{formatSeconds(position)}</Text>
+                        <Text>{formatSeconds(duration-position)}</Text>
                     </View>
                 </View>
             </View>
