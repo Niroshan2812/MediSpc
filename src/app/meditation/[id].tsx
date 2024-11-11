@@ -6,10 +6,38 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
-
+import { Audio } from "expo-av";
 import { meditations } from '@/data';
+import { useEffect, useState } from "react";
+
+
 export default function MeditationDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
+    const [sound,setSound] = useState<Audio.Sound |undefined>();
+
+
+     useEffect(() => {
+        const loadSound = async () => {
+          const { sound } = await Audio.Sound.createAsync(
+            require('@assets/meditations/mediAudio.mp3')
+          );
+          setSound(sound);
+        };
+    
+        loadSound();
+        return () => {
+          if (sound) {
+            sound.unloadAsync(); 
+          }
+        };
+      }, []);
+
+    async function playSound (){
+        if(sound){
+            await sound.playAsync();
+        }
+    }
+    
 
     const meditation = meditations.find((m) => m.id == Number(id));
     if (!meditation) {
@@ -31,7 +59,7 @@ export default function MeditationDetails() {
                 <Text className="text-3xl mt-10 text-center font-semibold">{meditation?.title}  </Text>
             </View>
             {/* Middle */}
-            <Pressable className="bg-zinc-600 self-center p-6 w-20 aspect-square rounded-full items-center justify-center">
+            <Pressable onPress={playSound} className="bg-zinc-600 self-center p-6 w-20 aspect-square rounded-full items-center justify-center">
                 <FontAwesome6 name="play" size={24} color="white" />
 
             </Pressable>
